@@ -186,9 +186,7 @@ Occasional high outliers due to network variation
 
 Boxplot Output
 
-(Replace with your actual image filename)
-
-![Latency Boxplot](screenshots/latency_boxplot.png)
+![Latency Boxplot](latency_boxplot.png)
 
 ▶ How to Run Locally
 1. Install dependencies
