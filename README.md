@@ -221,7 +221,7 @@ Key observations:
 The boxplot image is shown below and is also saved in the repository.
 
 
-![Latency Boxplot](Screenshots/latency_boxplot.png)
+![Latency Boxplot](latency_boxplot.png)
 
 
 ---
@@ -288,13 +288,13 @@ The project layout is shown below:
 ### Demo Web Page
 
 
-![Demo Page](Screenshots/demo_page.png)
+![Demo Page](demo_page.png)
 
 
 ### Latency Boxplot
 
 
-![Latency Boxplot](Screenshots/latency_boxplot.png)
+![Latency Boxplot](latency_boxplot.png)
 
 
 
