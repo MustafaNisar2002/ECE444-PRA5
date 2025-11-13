@@ -221,7 +221,7 @@ Key observations:
 The boxplot image is shown below and is also saved in the repository.
 
 ```md
-![Latency Boxplot](screenshots/latency_boxplot.png)
+![Latency Boxplot](latency_boxplot.png)
 ```
 
 ---
