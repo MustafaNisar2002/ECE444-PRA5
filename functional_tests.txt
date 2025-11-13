@@ -1,0 +1,4 @@
+fake_1: "Scientists confirm that drinking bleach cures all diseases."
+fake_2: "World to end tomorrow, government officials already evacuating to Mars."
+real_1: "The central bank kept interest rates unchanged this quarter."
+real_2: "Researchers published new findings on battery efficiency in a journal."
