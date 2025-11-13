@@ -219,10 +219,10 @@ http://127.0.0.1:5000/demo
 
 📸 Screenshots
 Demo Web Page
-![Demo Screen](screenshots/demo_page.png)
+![Demo Screen](demo_page.png)
 
 Latency Boxplot
-![Latency Boxplot](screenshots/latency_boxplot.png)
+![Latency Boxplot](latency_boxplot.png)
 
 ✅ Conclusion
 
