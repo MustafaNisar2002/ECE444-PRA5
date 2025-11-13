@@ -220,9 +220,9 @@ Key observations:
 
 The boxplot image is shown below and is also saved in the repository.
 
-```md
-![Latency Boxplot](screenshots/latency_boxplot.png)
-```
+
+![Latency Boxplot](Screenshots/latency_boxplot.png)
+
 
 ---
 
@@ -258,20 +258,25 @@ http://127.0.0.1:5000/demo
 
 ## Project Structure
 
-A possible project layout is shown below (actual layout may vary slightly):
+The project layout is shown below:
 
 ```text
 ├── application.py
 ├── requirements.txt
 ├── basic_classifier.pkl
 ├── count_vectorizer.pkl
-├── templates/
+├── perf_eval.py
+├── plot_latency.py
+├── Templates/
 │   └── demo.html
-├── results/
+├── Results/
 │   ├── fake_1.csv
 │   ├── fake_2.csv
 │   ├── real_1.csv
 │   ├── real_2.csv
+│   └── latency_boxplot.png
+├── Screenshots/
+│   ├── demo_page.csv
 │   └── latency_boxplot.png
 └── README.md
 ```
@@ -282,15 +287,14 @@ A possible project layout is shown below (actual layout may vary slightly):
 
 ### Demo Web Page
 
-```md
-![Demo Page](screenshots/demo_page.png)
-```
+
+![Demo Page](Screenshots/demo_page.png)
+
 
 ### Latency Boxplot
 
-```md
-![Latency Boxplot](screenshots/latency_boxplot.png)
-```
 
-Place your actual screenshot files in a `screenshots/` folder (or update the paths above to match your repository). Once committed to GitHub, the images will render directly in this README.
+![Latency Boxplot](Screenshots/latency_boxplot.png)
+
+
 
