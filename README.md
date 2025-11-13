@@ -1,212 +1,272 @@
-📰 Fake News Detection API – Deployment on AWS Elastic Beanstalk
+# Fake News Detection API – AWS Elastic Beanstalk Deployment
 
-This repository contains a complete Machine Learning deployment workflow where a Fake News Detection model (Logistic Regression + CountVectorizer) is deployed as a Flask REST API on AWS Elastic Beanstalk.
-A web demo page (/demo) allows users to classify text as Real (0) or Fake (1), while an API endpoint (/predict) supports programmatic inference.
+This repository contains a Machine Learning deployment where a Fake News Detection model is exposed as a Flask REST API and deployed on AWS Elastic Beanstalk. A demo web page (`/demo`) lets users classify text as **Real (0)** or **Fake (1)**, and an API endpoint (`/predict`) supports programmatic access.
 
-📌 Table of Contents
+---
 
-Project Overview
+## Table of Contents
 
-Model Description
+1. [Project Overview](#project-overview)
+2. [Model Description](#model-description)
+3. [Application Architecture](#application-architecture)
+4. [Deployment on AWS Elastic Beanstalk](#deployment-on-aws-elastic-beanstalk)
+5. [API Endpoints](#api-endpoints)
+6. [Web Demo UI](#web-demo-ui)
+7. [Testing and Evaluation](#testing-and-evaluation)
+8. [Latency Results and Boxplot](#latency-results-and-boxplot)
+9. [Running the App Locally](#running-the-app-locally)
+10. [Project Structure](#project-structure)
+11. [Screenshots](#screenshots)
 
-Application Architecture
+---
 
-Deployment (AWS Elastic Beanstalk)
+## Project Overview
 
-API Endpoints
+The goal of this project is to implement and deploy a functional Fake News Detection API capable of classifying news text as real or fake. The API is backed by a trained ML model and served through Flask, deployed using AWS Elastic Beanstalk.
 
-Web Demo UI
+The main tasks completed in this project are:
 
-Performance / Latency Testing
+- Trained a fake news classifier.
+- Saved the trained model and vectorizer as `basic_classifier.pkl` and `count_vectorizer.pkl`.
+- Implemented a Flask REST API in `application.py`.
+- Created an HTML demo page at `/demo`.
+- Deployed the application to AWS Elastic Beanstalk.
+- Performed functional testing with several input examples.
+- Performed latency testing with 4 test cases and 100 API calls per case.
+- Generated a boxplot summarizing API latency.
 
-Results & Boxplot
+---
 
-How to Run Locally
-
-Project Structure
-
-Screenshots
-
-🧠 Project Overview
-
-The goal of this project is to implement and deploy a functional Fake News Detection API capable of classifying news text as real or fake.
-The API is backed by a trained ML model and served through Flask, deployed using AWS Elastic Beanstalk’s Python platform.
-
-You completed the following tasks:
-
-✔ Trained a fake news classifier
-✔ Saved basic_classifier.pkl and count_vectorizer.pkl
-✔ Built a Flask REST API (application.py)
-✔ Created a visual web demo (/demo)
-✔ Deployed the full application to AWS Elastic Beanstalk
-✔ Ran functional + performance tests
-✔ Generated boxplots for latency analysis
-
-🤖 Model Description
+## Model Description
 
 The ML model consists of:
 
-CountVectorizer (bag-of-words)
+- **CountVectorizer** (bag-of-words text representation)
+- **Logistic Regression classifier**
 
-Logistic Regression classifier
+The model was trained on a dataset of labeled fake and real news articles. After training, the following artifacts were serialized using `pickle`:
 
-Trained on a dataset of labeled fake and real news articles.
-The model is serialized using pickle and loaded at API startup.
+- `basic_classifier.pkl` – the trained classifier.
+- `count_vectorizer.pkl` – the fitted CountVectorizer.
 
-🏗 Application Architecture
-User → /demo (HTML form) → Flask API → Model → Prediction → Response
-User → /predict (JSON API) → Flask API → Model → Prediction → JSON output
+At application startup, these pickled artifacts are loaded into memory and reused for all subsequent requests.
 
+---
 
-AWS Elastic Beanstalk handles:
+## Application Architecture
 
-Load balancing
+High-level flow:
 
-Scaling
+```text
+User → /demo (HTML form) → Flask API → Model → Prediction → HTML response
 
-Hosting the Flask app
+User → /predict (JSON)     → Flask API → Model → Prediction → JSON response
+```
 
-Serving static + dynamic routes
+The model artifacts are located in the application directory when deployed on Elastic Beanstalk, e.g.
 
-Model files are stored inside the deployed bundle under:
-
+```text
 /var/app/current/basic_classifier.pkl
 /var/app/current/count_vectorizer.pkl
+```
 
-🚀 Deployment (AWS Elastic Beanstalk)
+The Flask application exposes both a browser-based demo and a JSON API.
 
-Steps you performed:
+---
 
-Created a Python 3.13 application environment
+## Deployment on AWS Elastic Beanstalk
 
-Configured folder with:
+The app is deployed on AWS Elastic Beanstalk using the Python platform.
 
-application.py
+High-level deployment steps:
 
-requirements.txt
+1. Create a new Elastic Beanstalk application and environment (Python platform).
+2. Prepare a deployment bundle (ZIP file) containing:
+   - `application.py`
+   - `requirements.txt`
+   - `basic_classifier.pkl`
+   - `count_vectorizer.pkl`
+   - `templates/demo.html`
+   - `Procfile` (if required by the platform)
+3. From the Elastic Beanstalk console, choose **Upload and deploy** and select the ZIP file.
+4. Wait for the environment health to become **OK**.
+5. Access the environment URL in a browser to verify that the app is running.
 
-model .pkl files
+---
 
-templates/demo.html
+## API Endpoints
 
-Zipped and uploaded to AWS
+### 1. Health Check
 
-Ensured successful health state
-
-Tested API through browser + terminal
-
-🔌 API Endpoints
-1. Root (Health Check)
+```http
 GET /
+```
 
+Returns a small JSON payload indicating that the application and model are loaded.
 
-Returns a JSON confirming model-load success.
+Example response:
 
-Example:
-
+```json
 {
   "status": "ok",
-  "model_loaded": true
+  "model_loaded": true,
+  "model_path": "/var/app/current/basic_classifier.pkl",
+  "vectorizer_path": "/var/app/current/count_vectorizer.pkl"
 }
+```
 
-2. Predict Endpoint
+---
+
+### 2. Prediction API
+
+```http
 POST /predict
 Content-Type: application/json
+```
 
-Request:
+**Request body:**
+
+```json
 {
-  "text": "Some news sentence..."
+  "text": "Some news sentence to classify."
 }
+```
 
-Response:
+**Response body:**
+
+```json
 {
-  "prediction": 1
+  "prediction": 0
 }
-
+```
 
 Where:
 
-0 = Real
+- `0` = Real news
+- `1` = Fake news
 
-1 = Fake
+**Example cURL command:**
 
-Example cURL Test
+```bash
 curl -s -X POST "http://<your-env>.elasticbeanstalk.com/predict" \
   -H "Content-Type: application/json" \
-  -d '{"text": "hello world"}'
+  -d '{"text": "The central bank kept interest rates unchanged this quarter."}'
+```
 
-🌐 Web Demo UI
+---
 
-The web demo is accessible at:
+## Web Demo UI
 
+The demo page is served at:
+
+```text
 http://<your-env>.elasticbeanstalk.com/demo
+```
 
+The page contains:
 
-Users can enter text and instantly see predictions.
+- A textarea where the user can paste or type a news snippet.
+- A **Predict** button that sends the text to the backend.
+- A prediction label at the bottom showing `Real (0)` or `Fake (1)`.
 
-Screenshot of the Demo Page
+See the screenshot in the [Screenshots](#screenshots) section.
 
-(Replace with your actual repo image filename)
+---
 
-![Demo Screenshot](screenshots/demo_page.png)
+## Testing and Evaluation
 
-⏱ Performance / Latency Testing
+Two types of testing were performed:
 
-You conducted:
+### 1. Functional / Unit Testing
 
-Four test cases
+Four test inputs were created:
 
-fake_1, fake_2
+- Two examples that resemble fake news.
+- Two examples that resemble real news.
 
-real_1, real_2
+Each input was manually tested via:
 
-100 API calls per test case
+- The `/demo` web form, and
+- Direct calls to the `/predict` JSON API.
 
-Stored latencies into CSV files (100 rows/test case)
+This verified that the endpoint is reachable, the model is loaded correctly, and predictions are returned without errors.
 
-Created a boxplot summarizing latency distributions
+### 2. Latency / Performance Testing
 
-Testing script used:
+To evaluate performance, the four test cases above were used in a script that:
 
-Python requests
+- Calls the `/predict` endpoint 100 times per test case (400 total requests).
+- Measures the latency of each request using `time.perf_counter()`.
+- Records an ISO timestamp and latency (in milliseconds) to a CSV file.
 
-time.perf_counter()
+For each of the four test cases, there is a corresponding CSV file containing 100 rows.
 
-CSV writing
+---
 
-📊 Results & Boxplot
+## Latency Results and Boxplot
 
-Your API latency boxplot shows:
+The latency measurements for the four test cases were visualized as a boxplot. Each box corresponds to one of the following cases:
 
-Mean_latency ≈ 88–90 ms
+- `fake_1`
+- `fake_2`
+- `real_1`
+- `real_2`
 
-Very consistent performance
+Key observations:
 
-Occasional high outliers due to network variation
+- Median latency for all four cases is around 88–90 ms.
+- The distributions are quite similar across cases.
+- A few higher-latency outliers appear, which is expected due to network and server variability.
 
-Boxplot Output
+The boxplot image is shown below and is also saved in the repository.
 
-![Latency Boxplot](latency_boxplot.png)
+```md
+![Latency Boxplot](screenshots/latency_boxplot.png)
+```
 
-▶ How to Run Locally
-1. Install dependencies
+---
+
+## Running the App Locally
+
+You can also run the Flask application locally for development.
+
+### 1. Install dependencies
+
+```bash
 pip install -r requirements.txt
+```
 
-2. Run Flask app
+### 2. Start the Flask server
+
+```bash
 python application.py
+```
 
-3. Visit in browser:
+By default, the app will run on:
+
+```text
+http://127.0.0.1:5000
+```
+
+The demo page will be available at:
+
+```text
 http://127.0.0.1:5000/demo
+```
 
-📁 Project Structure
+---
+
+## Project Structure
+
+A possible project layout is shown below (actual layout may vary slightly):
+
+```text
 ├── application.py
 ├── requirements.txt
 ├── basic_classifier.pkl
 ├── count_vectorizer.pkl
 ├── templates/
 │   └── demo.html
-├── test_scripts/
-│   └── latency_test.py
 ├── results/
 │   ├── fake_1.csv
 │   ├── fake_2.csv
@@ -214,26 +274,23 @@ http://127.0.0.1:5000/demo
 │   ├── real_2.csv
 │   └── latency_boxplot.png
 └── README.md
+```
 
-📸 Screenshots
-Demo Web Page
-![Demo Screen](demo_page.png)
+---
 
-Latency Boxplot
+## Screenshots
+
+### Demo Web Page
+
+```md
+![Demo Page](demo_page.png)
+```
+
+### Latency Boxplot
+
+```md
 ![Latency Boxplot](latency_boxplot.png)
+```
 
-✅ Conclusion
+Place your actual screenshot files in a `screenshots/` folder (or update the paths above to match your repository). Once committed to GitHub, the images will render directly in this README.
 
-You have successfully:
-
-Built a Fake News Detection model
-
-Deployed it as a REST API on AWS
-
-Built a working web front-end
-
-Conducted thorough latency testing
-
-Visualized API performance
-
-Your project meets (and exceeds) typical ML deployment lab requirements.
